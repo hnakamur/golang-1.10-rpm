@@ -134,16 +134,6 @@ Requires:       go-srpm-macros
 Provides:       go-srpm-macros
 %endif
 
-
-Patch0:         golang-1.9rc1-verbose-build.bash
-
-# use the arch dependent path in the bootstrap
-Patch212:       golang-1.9rc1-bootstrap-binary-path.patch
-
-# we had been just removing the zoneinfo.zip, but that caused tests to fail for users that 
-# later run `go test -a std`. This makes it only use the zoneinfo.zip where needed in tests.
-Patch215:       ./go1.5-zoneinfo_testing_only.patch
-
 #override default GOTRACEBACK leve using --tag=rpm_crashtraceback
 Patch216:       ./fedora.go
 
@@ -267,14 +257,6 @@ Requires:       %{name} = %{version}-%{release}
 
 %prep
 %setup -q -n go
-
-# increase verbosity of build
-%patch0 -p1 -b .verbose
-
-# use the arch dependent path in the bootstrap
-%patch212 -p1 -b .bootstrap
-
-%patch215 -p1
 
 cp %{PATCH216} ./src/runtime/
 
