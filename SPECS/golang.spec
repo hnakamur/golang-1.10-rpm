@@ -137,6 +137,19 @@ Provides:       go-srpm-macros
 #override default GOTRACEBACK leve using --tag=rpm_crashtraceback
 Patch216:       ./fedora.go
 
+# On CentOS 6, skip TestObjFile in
+# cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go
+# because addr2line in binutils on CentOS 6 is too old and does not
+# support '-a' option.
+#
+# The following code runs addr2line with '-a' option as well as other
+# options.
+# https://github.com/golang/go/blob/go1.10/src/cmd/vendor/github.com/google/pprof/internal/binutils/addr2liner.go#L90
+#
+# The addr2line '-a' option was added at commit be6f64938f9.
+# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commit;h=be6f64938f9
+Patch217:       skip_binutils_test_obj_file.patch
+
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
 
@@ -259,6 +272,10 @@ Requires:       %{name} = %{version}-%{release}
 %setup -q -n go
 
 cp %{PATCH216} ./src/runtime/
+
+%if 0%{?rhel} < 7
+%patch217 -p1
+%endif
 
 %build
 # print out system information
